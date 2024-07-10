@@ -10,10 +10,19 @@
 #include <sstream>
 #include <iomanip>
 
+#ifdef _SVE_
+#include <arm_sve.h>
+#endif
+
 using namespace std;
 
 extern "C"
 {
+#ifdef _SVE_
+    void sve_fmla_vv_f32f32f32(int64_t);
+    void sve_fmla_vv_f64f64f64(int64_t);
+#endif
+
 #ifdef _ASIMD_
     void asimd_fmla_vs_f32f32f32(int64_t);
     void asimd_fmla_vv_f32f32f32(int64_t);
@@ -316,6 +325,13 @@ static void cpufp_register_isa()
         0x10000000LL, 96LL, asimd_fmla_vs_f64f64f64);
     reg_new_isa("asimd", "fmla.vv(f64,f64,f64)", "FLOPS",
         0x10000000LL, 96LL, asimd_fmla_vv_f64f64f64);
+#endif
+
+#ifdef _SVE_
+    reg_new_isa("sve", "fmla.vv(f32,f32,f32)", "FLOPS",
+        0x10000000LL, 48LL * static_cast<long long>(svcntw()), sve_fmla_vv_f32f32f32);
+    reg_new_isa("sve", "fmla.vv(f64,f64,f64)", "FLOPS",
+        0x10000000LL, 24LL * static_cast<long long>(svcntw()), sve_fmla_vv_f64f64f64);
 #endif
 }
 

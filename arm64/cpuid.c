@@ -42,6 +42,12 @@ int main()
     }
 #endif
 
+#ifdef HWCAP_SVE
+    if (hwcaps & HWCAP_SVE)
+    {
+        printf("_SVE_\n");
+    }
+#endif
     return 0;
 }
 
